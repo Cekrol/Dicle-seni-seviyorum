@@ -55,6 +55,7 @@
         .theme-btn:hover {
             background: var(--text-color);
             color: var(--bg-color);
+            border: 3px solid var(--text-color);
         }
 
         /* --- 1. ADIM: PARMAK İZİ KİLİT EKRANI --- */
@@ -95,7 +96,7 @@
             cursor: pointer;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: none; /* Mobilde basılı tutarken ekranın kaymasını engeller */
+            touch-action: none;
         }
 
         .scanner-container.scanning {
@@ -410,8 +411,7 @@
         </div>
         <div class="love-quote" id="loveQuote">Sana aşığım lan</div>
     </div>
-
-    <script>
+        <script>
         // --- PARMAK İZİ GERÇEKÇİ TARAMA SİSTEMİ ---
         let scanTimer = null;
 
@@ -591,4 +591,78 @@
                     if (mouse.x !== null && mouse.y !== null) {
                         const dx = this.x - mouse.x;
                         const dy = this.y - mouse.y;
-                        const distance = Math.sqrt(dx * d
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < mouse.radius) {
+                            const force = (mouse.radius - distance) / mouse.radius;
+                            const angle = Math.atan2(dy, dx);
+                            destX += Math.cos(angle) * force * 120; 
+                            destY += Math.sin(angle) * force * 120;
+                        }
+                    }
+
+                    this.x += (destX - this.x) * this.speed;
+                    this.y += (destY - this.y) * this.speed;
+                }
+
+                draw(color) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < particleCount; i++) {
+                const t = (i / particleCount) * Math.PI * 2;
+                particles.push(new HeartParticle(t));
+            }
+
+            let timeCounter = 0;
+
+            function renderLoop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                timeCounter += 0.04;
+
+                const currentThemeColor = document.body.classList.contains('white-theme') ? '#000000' : '#ffffff';
+
+                const pulseFactor = 1 + 0.08 * Math.sin(timeCounter * 1.5);
+
+                particles.forEach(p => {
+                    p.update(pulseFactor);
+                    p.draw(currentThemeColor);
+                });
+
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < 65) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            
+                            const opacity = (1 - distance / 65) * 0.35;
+                            
+                            if(document.body.classList.contains('white-theme')) {
+                                ctx.strokeStyle = `rgba(0, 0, 0, ${opacity})`;
+                            } else {
+                                ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+                            }
+                            
+                            ctx.lineWidth = 1.5; 
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                requestAnimationFrame(renderLoop);
+            }
+
+            requestAnimationFrame(renderLoop);
+        }
+    </script>
+</body>
+</html>
