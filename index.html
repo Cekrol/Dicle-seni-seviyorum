@@ -14,12 +14,35 @@
         }
 
         body {
-            background-color: #000000;
+            background-color: #0d0221;
             margin: 0;
             padding: 0;
             overflow: hidden;
             height: 100vh;
             font-family: 'Press Start 2P', monospace;
+            position: relative;
+        }
+
+        /* --- AKIŞKAN NEBULA ARKA PLANI (Pembe, Açık Mavi, Mor, Kırmızı) --- */
+        .nebula-bg {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, #ff0055 0%, transparent 45%),
+                        radial-gradient(circle at 70% 40%, #7a00ff 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, #00bfff 0%, transparent 45%),
+                        radial-gradient(circle at 80% 70%, #ff3333 0%, transparent 40%);
+            filter: blur(70px);
+            animation: rotateNebula 25s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes rotateNebula {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.15); }
+            100% { transform: rotate(360deg) scale(1); }
         }
 
         .wrapper {
@@ -32,9 +55,10 @@
             justify-content: center;
             align-items: center;
             z-index: 10;
+            transition: opacity 0.5s ease;
         }
 
-        /* --- YILDIZ EFEKTLERİ BAŞLANGICI --- */
+        /* --- DAHA GÜÇLÜ PARLAYAN AZ SAYIDA YILDIZLAR --- */
         #starContainer {
             position: absolute;
             top: 0;
@@ -45,34 +69,34 @@
             pointer-events: none;
         }
 
-        /* Yıldızların ana taşıyıcısı */
         .star {
             position: absolute;
             opacity: 0;
             animation: twinkle linear infinite;
-            /* Yıldızların parlaması için beyaz bir ışık efekti */
-            filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.9));
+            /* Ultra parlama efekti */
+            filter: drop-shadow(0 0 8px #ffffff) drop-shadow(0 0 18px rgba(255, 255, 255, 0.9));
         }
 
         @keyframes twinkle {
-            0% { opacity: 0; transform: scale(0.3) rotate(0deg); }
-            50% { opacity: 1; transform: scale(1.2) rotate(5deg); }
-            100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+            0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.4) rotate(8deg); }
+            100% { opacity: 0; transform: scale(0.2) rotate(0deg); }
         }
-        /* --- YILDIZ EFEKTLERİ BİTİŞİ --- */
 
+        /* Buzlu Cam Efektli Premium Pixel Pencere */
         .pixel-window {
-            background-color: #000000;
-            border: 6px double #ffffff;
-            width: 400px;
+            background-color: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 6px double rgba(255, 255, 255, 0.9);
+            width: 420px;
             max-width: 90%;
-            box-shadow: 12px 12px 0px #1a1a1a;
-            transition: all 0.1s ease;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
             z-index: 2;
         }
 
         .window-bar {
-            border-bottom: 4px solid #ffffff;
+            border-bottom: 4px solid rgba(255, 255, 255, 0.8);
             padding: 10px;
             display: flex;
             gap: 6px;
@@ -85,16 +109,17 @@
         }
 
         .window-body {
-            padding: 50px 20px;
+            padding: 45px 20px;
             text-align: center;
         }
 
         .title-text {
             color: #ffffff;
-            font-size: 13pt;
-            line-height: 1.6;
-            margin: 0 0 45px 0;
+            font-size: 12pt;
+            line-height: 1.7;
+            margin: 0 0 40px 0;
             font-weight: normal;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .btn-container {
@@ -112,6 +137,7 @@
             cursor: pointer;
             font-family: 'Press Start 2P', monospace;
             outline: none;
+            transition: all 0.1s ease;
         }
 
         .pixel-btn:hover {
@@ -126,89 +152,63 @@
             z-index: 50;
         }
 
-        .pixel-smiler {
-            display: none;
-            color: #ffffff;
-            font-size: 45pt;
-            text-align: center;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 20;
-        }
-
-        .neon-center-set {
-            display: none;
-            position: absolute;
-            top: 53%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            flex-direction: column;
-            align-items: center;
-            gap: 0px;
-            z-index: 6;
-            user-select: none;
-            pointer-events: none;
-        }
-
-        .neon-text {
-            color: #ffccff;
-            font-size: 26pt;
-            text-align: center;
-            margin-bottom: 5px;
-            text-shadow: 0 0 5px #ffccff, 0 0 15px #ff3399, 0 0 30px #ff3399;
-        }
-
-        .neon-heart-svg {
-            width: 140px;
-            height: 140px;
-            filter: drop-shadow(0 0 4px #ffccff) drop-shadow(0 0 10px #ff3399) drop-shadow(0 0 25px #ff3399) drop-shadow(0 0 45px #ff3399);
-        }
-
-        .matrix-bg {
+        /* --- EVET'E BASINCA AÇILACAK ÖZEL EKRAN --- */
+        .special-screen {
             display: none;
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            justify-content: space-between;
-            overflow: hidden;
-            z-index: 1;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .matrix-column {
-            display: flex;
             flex-direction: column;
-            white-space: nowrap;
-            font-size: 13px;
-            line-height: 1.5;
-            color: rgba(255, 51, 153, 0.45);
-            user-select: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            text-align: center;
+            padding: 20px;
         }
 
-        .matrix-move {
-            animation: scrollDown 10s linear infinite;
+        /* Parlayan Romantik Ay Figürü */
+        .glowing-moon {
+            width: 130px;
+            height: 130px;
+            filter: drop-shadow(0 0 15px #fffde7) drop-shadow(0 0 30px rgba(255, 253, 231, 0.6));
+            margin-bottom: 35px;
+            animation: floatMoon 4s ease-in-out infinite;
         }
 
-        .matrix-column:nth-child(even) .matrix-move {
-            animation: scrollDown 7s linear infinite;
+        @keyframes floatMoon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
-        @keyframes scrollDown {
-            0% { transform: translateY(-50%); }
-            100% { transform: translateY(0%); }
+        .love-message {
+            color: #ffffff;
+            font-size: 14pt;
+            line-height: 1.8;
+            max-width: 650px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.4);
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .neon-d {
+            color: #ffccff;
+            font-size: 28pt;
+            text-shadow: 0 0 10px #ffccff, 0 0 25px #ff3399;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-    <div class="wrapper" id="viewInterface">
-        <div id="starContainer"></div>
+    <div class="nebula-bg"></div>
 
+    <div id="starContainer"></div>
+
+    <div class="wrapper" id="viewInterface">
         <div class="pixel-window" id="popupWindow">
             <div class="window-bar">
                 <span class="window-dot"></span>
@@ -216,7 +216,7 @@
                 <span class="window-dot"></span>
             </div>
             <div class="window-body">
-                <h1 class="title-text">Ne kadar tartışsakda seni seviyorum peki sen?</h1>
+                <h1 class="title-text">Sana bir soru sormak istiyorum...</h1>
                 <div class="btn-container">
                     <button class="pixel-btn" onclick="triggerYes()">Yes</button>
                     <button class="pixel-btn" id="noBtn" onmouseover="fleeNo()" onclick="fleeNo()" ontouchstart="fleeNo()">No</button>
@@ -225,46 +225,40 @@
         </div>
     </div>
 
-    <div class="pixel-smiler" id="smileContainer">:)</div>
-
-    <div class="neon-center-set" id="neonSet" style="display: none;">
-        <div class="neon-text">D🫠</div>
-        <svg class="neon-heart-svg" viewBox="0 0 24 24" fill="#ffccff">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    <div class="special-screen" id="specialScreen">
+        <svg class="glowing-moon" viewBox="0 0 24 24" fill="#fffde7">
+            <path d="M12.3,2A10,10,0,0,0,22,11.7a1,1,0,0,1,1,1.1,10,10,0,1,1-11.8-11.8,1,1,0,0,1,1.1,1Z"/>
         </svg>
+        <h2 class="love-message">ne kadar tartissakta seni seviyorum</h2>
+        <div class="neon-d">D 🫠</div>
     </div>
 
-    <div class="matrix-bg" id="bgContainer"></div>
-
     <script>
-        // 4 Köşeli Kavisli Yıldızları Oluşturma Fonksiyonu
+        // Sayısı azaltılmış ama çok daha güçlü parlayan yıldızlar
         function createStars() {
             const container = document.getElementById('starContainer');
-            const starCount = 65; // Ekranı çok boğmamak için ideal sayı
+            const starCount = 20; // 80'den 20'ye düşürerek sadeleştirdik
 
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 
-                // Gönderdiğin fotoğraftaki kavisli sivri yıldız şeklinin aynısı (SVG çizimi)
                 star.innerHTML = `
                     <svg viewBox="0 0 24 24" fill="#ffffff" style="width:100%; height:100%;">
                         <path d="M12 0 Q12 12 24 12 Q12 12 12 24 Q12 12 0 12 Q12 12 12 0 Z"/>
                     </svg>
                 `;
                 
-                // Rastgele konum
                 star.style.left = Math.random() * 100 + 'vw';
                 star.style.top = Math.random() * 100 + 'vh';
                 
-                // Yıldız boyutları (Şeklin net seçilmesi için 12px ile 28px arası rastgele)
-                const size = Math.random() * 16 + 12;
+                // Yıldızların boyutu (Daha belirgin parlamaları için hafif büyütüldü)
+                const size = Math.random() * 14 + 14; 
                 star.style.width = size + 'px';
                 star.style.height = size + 'px';
                 
-                // Rastgele parlama hızı ve gecikme süreleri
-                const duration = Math.random() * 3 + 2; // 2sn - 5sn arası
-                const delay = Math.random() * 5;
+                const duration = Math.random() * 2.5 + 2; 
+                const delay = Math.random() * 4;
                 star.style.animationDuration = duration + 's';
                 star.style.animationDelay = delay + 's';
                 
@@ -272,49 +266,25 @@
             }
         }
 
-        // Sayfa açıldığında yıldızları yükle
         createStars();
 
-        const bgContainer = document.getElementById('bgContainer');
-
-        function buildMatrixBackground() {
-            bgContainer.innerHTML = '';
-            const charWidth = 95;
-            const columnCount = Math.ceil(window.innerWidth / charWidth) + 1;
-            let textBlock = "";
-            
-            for (let i = 0; i < 60; i++) {
-                textBlock += "Aşığım sana<br>";
-            }
-
-            for (let i = 0; i < columnCount; i++) {
-                const col = document.createElement('div');
-                col.className = 'matrix-column';
-                
-                const moveDiv = document.createElement('div');
-                moveDiv.className = 'matrix-move';
-                moveDiv.innerHTML = textBlock + textBlock;
-                
-                col.style.opacity = (Math.random() * 0.5 + 0.3).toFixed(2);
-                moveDiv.style.animationDelay = (Math.random() * -10) + 's';
-                
-                col.appendChild(moveDiv);
-                bgContainer.appendChild(col);
-            }
-        }
-
-        window.addEventListener('resize', buildMatrixBackground);
-
+        // Yes butonuna basınca olacak sihirli an
         function triggerYes() {
-            document.getElementById('viewInterface').style.display = 'none';
-            buildMatrixBackground();
+            const ui = document.getElementById('viewInterface');
+            const special = document.getElementById('specialScreen');
             
-            bgContainer.style.display = 'flex';
-            setTimeout(() => bgContainer.style.opacity = '1', 10);
+            ui.style.opacity = '0';
             
-            document.getElementById('neonSet').style.display = 'flex';
+            setTimeout(() => {
+                ui.style.display = 'none';
+                special.style.display = 'flex';
+                setTimeout(() => {
+                    special.style.opacity = '1';
+                }, 50);
+            }, 500);
         }
 
+        // Kaçan No Butonu
         function fleeNo() {
             const noBtn = document.getElementById('noBtn');
             
@@ -331,4 +301,3 @@
     </script>
 </body>
 </html>
-
