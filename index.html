@@ -9,352 +9,125 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Great+Vibes&family=Press+Start+2P&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --bg-color: #000000;
-            --text-color: #ffffff;
-            --star-color: #ffffff;
-        }
+        :root { --bg-color: #000000; --text-color: #ffffff; --star-color: #ffffff; }
+        body { background-color: var(--bg-color); margin: 0; padding: 0; overflow: hidden; height: 100vh; font-family: 'Press Start 2P', monospace; transition: background-color 0.5s ease; }
+        body.white-theme { --bg-color: #ffffff; --text-color: #000000; --star-color: #000000; }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100vh;
-            font-family: 'Press Start 2P', monospace;
-            position: relative;
-            transition: background-color 0.5s ease;
-        }
-
-        body.white-theme {
-            --bg-color: #ffffff;
-            --text-color: #000000;
-            --star-color: #000000;
-        }
-
-        /* --- ÜSTTEKİ TEMA DEĞİŞTİRME BUTONU --- */
-        .theme-btn {
-            display: none;
+        /* --- ÜSTTEKİ YENİ TEMA DEĞİŞTİRME BUTONU (TOGGLE SWITCH) --- */
+        .theme-switch {
+            display: none; /* Kilit açılmadan görünmez */
             position: fixed;
             top: 20px;
             right: 20px;
-            background: transparent;
-            color: var(--text-color);
-            border: 3px solid var(--text-color);
-            padding: 8px 16px;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 8pt;
-            cursor: pointer;
+            width: 60px;
+            height: 34px;
             z-index: 999999;
-            transition: all 0.3s ease;
         }
-        .theme-btn:hover {
-            background: var(--text-color);
-            color: var(--bg-color);
-            border: 3px solid var(--text-color);
+
+        .theme-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333; /* Siyah temada kapalı durumu */
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        /* Beyaz temaya (Açık duruma) geçildiğinde gönderdiğin fotoğraftaki mavi renk */
+        input:checked + .slider {
+            background-color: #3b82f6; 
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
         }
 
         /* --- 1. ADIM: PARMAK İZİ KİLİT EKRANI --- */
-        #lockScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #000000;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 1.2s ease-in-out, visibility 1.2s ease-in-out;
-        }
-
-        .lock-title {
-            font-family: 'Dancing Script', cursive;
-            color: #ffffff;
-            font-size: 32pt;
-            margin-bottom: 50px;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
-            user-select: none;
-        }
-
-        .scanner-container {
-            position: relative;
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            border: 3px solid rgba(255, 45, 85, 0.2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 0 25px rgba(255, 45, 85, 0.1);
-            cursor: pointer;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-        }
-
-        .scanner-container.scanning {
-            animation: spinRing 4s linear infinite;
-            border-top: 3px solid #ff2d55;
-            border-bottom: 3px solid #ff2d55;
-            box-shadow: 0 0 25px rgba(255, 45, 85, 0.4);
-        }
-
-        @keyframes spinRing {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .scanner-inner {
-            position: absolute;
-            width: 150px;
-            height: 180px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-        }
+        #lockScreen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000000; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 1.2s; }
+        .lock-title { font-family: 'Dancing Script', cursive; color: #ffffff; font-size: 32pt; margin-bottom: 50px; text-shadow: 0 0 10px rgba(255, 255, 255, 0.4); user-select: none; }
         
-        .scanner-container.scanning .scanner-inner {
-            animation: stopSpin 4s linear infinite reverse;
-        }
+        /* Mobilde basılı tutarken sorun çıkmaması için touch-action eklendi */
+        .scanner-container { width: 220px; height: 220px; border-radius: 50%; border: 3px solid rgba(255, 45, 85, 0.2); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 25px rgba(255, 45, 85, 0.1); cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: none; }
+        
+        .scanner-container.scanning { animation: spinRing 4s linear infinite; border-top: 3px solid #ff2d55; border-bottom: 3px solid #ff2d55; box-shadow: 0 0 25px rgba(255, 45, 85, 0.4); }
+        @keyframes spinRing { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .scanner-inner { position: absolute; width: 150px; height: 180px; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .scanner-container.scanning .scanner-inner { animation: stopSpin 4s linear infinite reverse; }
+        @keyframes stopSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .fingerprint-svg { width: 110px; height: 140px; fill: none; stroke: rgba(255, 45, 85, 0.4); stroke-width: 10; stroke-linecap: round; transition: filter 0.3s ease, stroke 0.3s ease; }
+        .scanner-container.scanning .fingerprint-svg { stroke: #ff2d55; filter: drop-shadow(0 0 12px #ff2d55); }
+        
+        .laser-line { position: absolute; left: 0; width: 100%; height: 4px; background: rgba(255, 45, 85, 0.3); top: 50%; pointer-events: none; }
+        .scanner-container.scanning .laser-line { background: #ff2d55; box-shadow: 0 0 15px #ff2d55, 0 0 25px #ff2d55; animation: scanMotion 1.2s ease-in-out infinite; }
+        @keyframes scanMotion { 0% { top: 10%; } 50% { top: 90%; } 100% { top: 10%; } }
+        
+        .lock-footer { font-family: Arial, sans-serif; font-style: italic; color: rgba(255, 255, 255, 0.6); font-size: 14pt; margin-top: 50px; user-select: none; }
 
-        @keyframes stopSpin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        /* --- YILDIZLAR --- */
+        #starContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .star { position: absolute; background-color: var(--star-color); clip-path: polygon(50% 0%, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0% 50%, 37% 37%); opacity: 0; animation: twinkle linear infinite; }
+        @keyframes twinkle { 0% { opacity: 0; transform: scale(0.3); } 50% { opacity: 0.8; transform: scale(1); } 100% { opacity: 0; transform: scale(0.3); } }
 
-        .fingerprint-svg {
-            width: 110px;
-            height: 140px;
-            fill: none;
-            stroke: rgba(255, 45, 85, 0.4);
-            stroke-width: 10;
-            stroke-linecap: round;
-            transition: filter 0.3s ease, stroke 0.3s ease;
-        }
+        .wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 10; transition: opacity 0.5s ease; }
+        .pixel-window { background-color: var(--bg-color); border: 6px double var(--text-color); width: 440px; max-width: 90%; box-shadow: 0 0 25px rgba(255,255,255,0.05); z-index: 2; transition: all 0.5s ease; }
+        .window-bar { border-bottom: 4px solid var(--text-color); padding: 10px; display: flex; gap: 6px; }
+        .window-dot { width: 8px; height: 8px; border: 2px solid var(--text-color); }
+        .window-body { padding: 45px 20px; text-align: center; }
+        .title-text { color: var(--text-color); font-size: 11pt; line-height: 1.8; margin: 0 0 40px 0; font-weight: normal; }
+        
+        .btn-container { display: flex; justify-content: center; gap: 50px; margin-top: 25px; }
+        .btn-wrapper { min-width: 120px; display: flex; justify-content: center; }
+        .pixel-btn { background: transparent; color: var(--text-color); border: 4px outset var(--text-color); padding: 12px 24px; font-size: 11pt; cursor: pointer; font-family: 'Press Start 2P', monospace; outline: none; }
+        .pixel-btn:hover { background: var(--text-color); color: var(--bg-color); border: 4px inset var(--text-color); }
+        #noBtn { position: relative; z-index: 9999; }
 
-        .scanner-container.scanning .fingerprint-svg {
-            stroke: #ff2d55;
-            filter: drop-shadow(0 0 12px #ff2d55);
-        }
+        .special-screen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 20; opacity: 0; transition: opacity 0.8s ease; }
+        #heartCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 21; }
+        
+        .center-letters { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 25; font-size: 45pt; font-family: 'Press Start 2P', monospace; display: flex; gap: 25px; pointer-events: none; opacity: 0; transition: opacity 2.5s ease-in-out; }
+        .char-d, .char-m { transition: opacity 0.4s ease, color 0.4s ease; }
 
-        .laser-line {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 45, 85, 0.3);
-            top: 50%;
-            pointer-events: none;
-        }
-
-        .scanner-container.scanning .laser-line {
-            background: #ff2d55;
-            box-shadow: 0 0 15px #ff2d55, 0 0 25px #ff2d55;
-            animation: scanMotion 1.2s ease-in-out infinite;
-        }
-
-        @keyframes scanMotion {
-            0% { top: 10%; }
-            50% { top: 90%; }
-            100% { top: 10%; }
-        }
-
-        .lock-footer {
-            font-family: Arial, sans-serif;
-            font-style: italic;
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 14pt;
-            margin-top: 50px;
-            user-select: none;
-        }
-
-        /* --- 4 KENARLI OVAL PARLAYAN YILDIZLAR --- */
-        #starContainer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .star {
-            position: absolute;
-            background-color: var(--star-color);
-            clip-path: polygon(50% 0%, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0% 50%, 37% 37%);
-            opacity: 0;
-            animation: twinkle linear infinite;
-        }
-
-        @keyframes twinkle {
-            0% { opacity: 0; transform: scale(0.3); }
-            50% { opacity: 0.8; transform: scale(1); }
-            100% { opacity: 0; transform: scale(0.3); }
-        }
-
-        .wrapper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            transition: opacity 0.5s ease;
-        }
-
-        .pixel-window {
-            background-color: var(--bg-color);
-            border: 6px double var(--text-color);
-            width: 440px;
-            max-width: 90%;
-            box-shadow: 0 0 25px rgba(255,255,255,0.05);
-            z-index: 2;
-            transition: all 0.5s ease;
-        }
-
-        .window-bar {
-            border-bottom: 4px solid var(--text-color);
-            padding: 10px;
-            display: flex;
-            gap: 6px;
-        }
-
-        .window-dot {
-            width: 8px;
-            height: 8px;
-            border: 2px solid var(--text-color);
-        }
-
-        .window-body {
-            padding: 45px 20px;
-            text-align: center;
-        }
-
-        .title-text {
-            color: var(--text-color);
-            font-size: 11pt;
-            line-height: 1.8;
-            margin: 0 0 40px 0;
-            font-weight: normal;
-        }
-
-        /* --- YENİDEN DÜZENLENMİŞ BUTON ARALIĞI --- */
-        .btn-container {
-            display: flex;
-            justify-content: center;
-            gap: 50px; /* Butonlar arası boşluk arttırıldı */
-            margin-top: 25px;
-        }
-
-        .btn-wrapper {
-            min-width: 120px; /* İç içe girmelerini engellemek için */
-            display: flex;
-            justify-content: center;
-        }
-
-        .pixel-btn {
-            background: transparent;
-            color: var(--text-color);
-            border: 4px outset var(--text-color);
-            padding: 12px 24px;
-            font-size: 11pt;
-            cursor: pointer;
-            font-family: 'Press Start 2P', monospace;
-            outline: none;
-        }
-
-        .pixel-btn:hover {
-            background: var(--text-color);
-            color: var(--bg-color);
-            border: 4px inset var(--text-color);
-        }
-
-        #noBtn {
-            position: relative;
-            z-index: 9999;
-        }
-
-        /* --- EVET EKRANI VE KALP ALANI --- */
-        .special-screen {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 20;
-            opacity: 0;
-            transition: opacity 0.8s ease;
-        }
-
-        #heartCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 21;
-        }
-
-        /* Ortadaki Harfler Alanı (D ve M) */
-        .center-letters {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 25;
-            font-size: 45pt;
-            font-family: 'Press Start 2P', monospace;
-            display: flex;
-            gap: 25px;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 2.5s ease-in-out;
-        }
-
-        .char-d, .char-m {
-            transition: opacity 0.4s ease, color 0.4s ease;
-        }
-
-        /* YENİ STİLDE KAN KIRMIZISI AŞK SÖZÜ */
-        .love-quote {
-            position: absolute;
-            bottom: 12%;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 26;
-            font-family: 'Great Vibes', cursive; /* Yeni Zarif Yazı Tipi */
-            color: #8a0303; /* Kan Kırmızısı */
-            font-size: 48pt; /* Biraz daha belirgin font */
-            text-align: center;
-            width: 100%;
-            opacity: 0;
-            transition: opacity 3s ease-in-out;
-            text-shadow: 0 0 15px rgba(138, 3, 3, 0.4);
-            pointer-events: none;
-        }
+        .love-quote { position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%); z-index: 26; font-family: 'Great Vibes', cursive; color: #8a0303; font-size: 48pt; text-align: center; width: 100%; opacity: 0; transition: opacity 3s ease-in-out; text-shadow: 0 0 15px rgba(138, 3, 3, 0.4); pointer-events: none; }
     </style>
 </head>
 <body>
 
-    <button id="themeToggleBtn" class="theme-btn" onclick="toggleTheme()">TEMA</button>
+    <label id="themeToggleBtn" class="theme-switch">
+        <input type="checkbox" onchange="toggleTheme()">
+        <span class="slider"></span>
+    </label>
 
     <div id="lockScreen">
         <div class="lock-title">Para ti, mi amor</div>
         
-        <div class="scanner-container" id="scannerZone" onclick="startScan()">
+        <div class="scanner-container" id="scannerZone" 
+             onmousedown="startScan(event)" 
+             onmouseup="cancelScan(event)" 
+             onmouseleave="cancelScan(event)" 
+             ontouchstart="startScan(event)" 
+             ontouchend="cancelScan(event)" 
+             ontouchcancel="cancelScan(event)"
+             oncontextmenu="return false;">
             <div class="scanner-inner">
                 <div class="laser-line"></div>
                 <svg class="fingerprint-svg" viewBox="0 0 512 512">
@@ -402,23 +175,42 @@
         <div class="love-quote" id="loveQuote">Sana aşığım lan</div>
     </div>
         <script>
+        // --- PARMAK İZİ "BASILI TUTMA" MANTIĞI ---
+        let scanTimer = null;
         let isScanning = false;
 
-        function startScan() {
+        function startScan(e) {
+            // Mobilde kaydırmayı engellemek için dokunma fonksiyonlarını durdur
+            if (e && e.cancelable && e.type !== 'mousedown') e.preventDefault();
+            
+            // Eğer zaten tarama başladıysa tekrar tetikleme
             if (isScanning) return; 
             isScanning = true;
 
+            // Efekti başlat (Lazer döner)
             document.getElementById('scannerZone').classList.add('scanning');
             
-            setTimeout(() => {
+            // 1.5 Saniye aralıksız basılırsa kilidi aç
+            scanTimer = setTimeout(() => {
                 const lock = document.getElementById('lockScreen');
                 lock.style.opacity = '0';
                 lock.style.visibility = 'hidden';
-                document.getElementById('themeToggleBtn').style.display = 'block'; 
+                document.getElementById('themeToggleBtn').style.display = 'inline-block'; 
                 applyLetterVisibility(); 
             }, 1500);
         }
 
+        function cancelScan(e) {
+            // El çekilirse süreyi iptal et ve efektleri durdur
+            if (scanTimer) {
+                clearTimeout(scanTimer);
+                scanTimer = null;
+            }
+            isScanning = false;
+            document.getElementById('scannerZone').classList.remove('scanning');
+        }
+
+        // --- SİYAH / BEYAZ TEMA DEĞİŞTİRME MANTIĞI ---
         function toggleTheme() {
             document.body.classList.toggle('white-theme');
             applyLetterVisibility();
@@ -429,7 +221,6 @@
             const mLetter = document.getElementById('letterM');
             const dLetter = document.getElementById('letterD');
             
-            // GÜNCELLENEN MANTIK: 
             // Beyaz temada D harfi görünür (Siyah renkli olur ki okunsun)
             if (isWhiteTheme) {
                 if(dLetter) {
@@ -649,3 +440,4 @@
     </script>
 </body>
 </html>
+
