@@ -41,45 +41,23 @@
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 1; /* Pencerenin arkasında kalması için */
-            pointer-events: none; /* Tıklamaları engellememesi için */
+            z-index: 1;
+            pointer-events: none;
         }
 
-        /* Ana yıldız taşıyıcısı */
+        /* Yıldızların ana taşıyıcısı */
         .star {
             position: absolute;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             opacity: 0;
             animation: twinkle linear infinite;
-        }
-
-        /* 4 köşeli sivri yıldızı oluşturan yatay ve dikey ışık çizgileri */
-        .star::before, .star::after {
-            content: "";
-            position: absolute;
-            background: #ffffff;
-            border-radius: 50%; /* Uçların sivri olması için */
-            box-shadow: 0 0 6px #ffffff;
-        }
-
-        /* Dikey ışık çizgisi */
-        .star::before {
-            width: 15%; /* Çizgi kalınlığı */
-            height: 100%; /* Çizgi uzunluğu */
-        }
-
-        /* Yatay ışık çizgisi */
-        .star::after {
-            width: 100%;
-            height: 15%;
+            /* Yıldızların parlaması için beyaz bir ışık efekti */
+            filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.9));
         }
 
         @keyframes twinkle {
-            0% { opacity: 0; transform: scale(0.2); }
-            50% { opacity: 1; transform: scale(1.3); }
-            100% { opacity: 0; transform: scale(0.2); }
+            0% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(5deg); }
+            100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
         }
         /* --- YILDIZ EFEKTLERİ BİTİŞİ --- */
 
@@ -90,7 +68,7 @@
             max-width: 90%;
             box-shadow: 12px 12px 0px #1a1a1a;
             transition: all 0.1s ease;
-            z-index: 2; /* Yıldızların önünde dursun */
+            z-index: 2;
         }
 
         .window-bar {
@@ -229,7 +207,6 @@
 <body>
 
     <div class="wrapper" id="viewInterface">
-        <!-- Yıldızların ekleneceği taşıyıcı -->
         <div id="starContainer"></div>
 
         <div class="pixel-window" id="popupWindow">
@@ -260,27 +237,34 @@
     <div class="matrix-bg" id="bgContainer"></div>
 
     <script>
-        // 4 Köşeli Yıldızları oluşturma fonksiyonu
+        // 4 Köşeli Kavisli Yıldızları Oluşturma Fonksiyonu
         function createStars() {
             const container = document.getElementById('starContainer');
-            const starCount = 80; // Çok kalabalık olmaması için sayıyı hafif düşürdük
+            const starCount = 65; // Ekranı çok boğmamak için ideal sayı
 
             for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 
-                // Rastgele konum (Ekranın %0 ile %100'ü arası)
+                // Gönderdiğin fotoğraftaki kavisli sivri yıldız şeklinin aynısı (SVG çizimi)
+                star.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="#ffffff" style="width:100%; height:100%;">
+                        <path d="M12 0 Q12 12 24 12 Q12 12 12 24 Q12 12 0 12 Q12 12 12 0 Z"/>
+                    </svg>
+                `;
+                
+                // Rastgele konum
                 star.style.left = Math.random() * 100 + 'vw';
                 star.style.top = Math.random() * 100 + 'vh';
                 
-                // Yıldızın toplam kaplayacağı alan (Daha net görünmesi için 8px ile 20px arası)
-                const size = Math.random() * 12 + 8;
+                // Yıldız boyutları (Şeklin net seçilmesi için 12px ile 28px arası rastgele)
+                const size = Math.random() * 16 + 12;
                 star.style.width = size + 'px';
                 star.style.height = size + 'px';
                 
-                // Rastgele parlama hızı ve gecikmesi
-                const duration = Math.random() * 3 + 2; // 2sn ile 5sn arası
-                const delay = Math.random() * 5; // 0sn ile 5sn arası
+                // Rastgele parlama hızı ve gecikme süreleri
+                const duration = Math.random() * 3 + 2; // 2sn - 5sn arası
+                const delay = Math.random() * 5;
                 star.style.animationDuration = duration + 's';
                 star.style.animationDelay = delay + 's';
                 
@@ -288,7 +272,7 @@
             }
         }
 
-        // Sayfa yüklendiğinde yıldızları başlat
+        // Sayfa açıldığında yıldızları yükle
         createStars();
 
         const bgContainer = document.getElementById('bgContainer');
@@ -322,7 +306,6 @@
         window.addEventListener('resize', buildMatrixBackground);
 
         function triggerYes() {
-            // Yıldızların bulunduğu ana ekranı gizle
             document.getElementById('viewInterface').style.display = 'none';
             buildMatrixBackground();
             
@@ -348,3 +331,4 @@
     </script>
 </body>
 </html>
+
