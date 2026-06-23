@@ -6,7 +6,7 @@
     <title>I Love You</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Press+Start+2P&display=swap" rel="stylesheet">
     
     <style>
         *, *::before, *::after {
@@ -21,6 +21,124 @@
             height: 100vh;
             font-family: 'Press Start 2P', monospace;
             position: relative;
+        }
+
+        /* --- 1. ADIM: GİRİŞTEKİ PARMAK İZİ KİLİT EKRANI (FOTOĞRAFIN AYNISI) --- */
+        #lockScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            z-index: 99999; /* Her şeyin en üstünde başlar */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1.5s ease-in-out, visibility 1.5s ease-in-out; /* Yavaşça açılması için */
+        }
+
+        .lock-title {
+            font-family: 'Dancing Script', cursive;
+            color: #ffffff;
+            font-size: 32pt;
+            margin-bottom: 50px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+            user-select: none;
+        }
+
+        /* Dairesel Tarayıcı Alanı */
+        .scanner-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 45, 85, 0.2);
+            border-top: 3px solid #ff2d55;
+            border-bottom: 3px solid #ff2d55;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 25px rgba(255, 45, 85, 0.2);
+            cursor: pointer;
+            animation: spinRing 4s linear infinite;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        @keyframes spinRing {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Döndürmeden sabit duran iç parmak izi yuvası */
+        .scanner-inner {
+            position: absolute;
+            width: 150px;
+            height: 180px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: rotate(0deg); /* Dış halkanın dönüşünü nötrlemek için sabit */
+            animation: stopSpin 4s linear infinite reverse;
+            overflow: hidden; /* Lazerin dışarı taşmaması için */
+        }
+
+        @keyframes stopSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fingerprint-svg {
+            width: 110px;
+            height: 140px;
+            fill: none;
+            stroke: #ff2d55;
+            stroke-width: 10;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 8px #ff2d55);
+            transition: filter 0.3s ease, stroke 0.3s ease;
+        }
+
+        /* Sürekli inip kalkan kırmızı lazer çizgisi */
+        .laser-line {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: #ff2d55;
+            box-shadow: 0 0 15px #ff2d55, 0 0 25px #ff2d55;
+            animation: scanMotion 2.2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanMotion {
+            0% { top: 10%; }
+            50% { top: 90%; }
+            100% { top: 10%; }
+        }
+
+        /* Basılı tutarken tarayıcının tepki vermesi */
+        .scanner-container:active .fingerprint-svg {
+            stroke: #ff66cc;
+            filter: drop-shadow(0 0 18px #ff66cc);
+        }
+
+        .scanner-container:active .laser-line {
+            background: #ff66cc;
+            box-shadow: 0 0 20px #ff66cc, 0 0 35px #ff66cc;
+            animation-duration: 0.8s; /* Basılı tutunca lazer hızlanır */
+        }
+
+        .lock-footer {
+            font-family: Arial, sans-serif;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14pt;
+            margin-top: 50px;
+            letter-spacing: 1px;
+            user-select: none;
         }
 
         /* --- KÜÇÜK VE ZARİF PARLAYAN YILDIZLAR --- */
@@ -172,10 +290,27 @@
 </head>
 <body>
 
-    <!-- Arka Plan Yıldızları -->
+    <div id="lockScreen">
+        <div class="lock-title">Para ti, mi amor</div>
+        
+        <div class="scanner-container" id="scannerZone" onmousedown="startScan()" onmouseup="cancelScan()" onmouseleave="cancelScan()" ontouchstart="startScan(event)" ontouchend="cancelScan(event)">
+            <div class="scanner-inner">
+                <div class="laser-line"></div>
+                <svg class="fingerprint-svg" viewBox="0 0 512 512">
+                    <path d="M256,440 C320,440 360,400 360,320 C360,220 290,160 256,160 C222,160 152,220 152,320 C152,350 160,380 180,410" />
+                    <path d="M210,425 C200,410 192,380 192,320 C192,250 230,200 256,200 C282,200 320,250 320,320 C320,380 300,410 280,425" />
+                    <path d="M256,360 C270,360 280,340 280,320 C280,280 265,240 256,240 C247,240 232,280 232,320 C232,340 242,360 256,360" />
+                    <path d="M120,320 C120,180 200,120 256,120 C312,120 392,180 392,320 C392,410 330,460 256,460 C210,460 160,440 130,410" />
+                    <path d="M90,340 C90,150 180,80 256,80 C332,80 422,150 422,340 C422,430 370,490 256,490" />
+                </svg>
+            </div>
+        </div>
+
+        <div class="lock-footer">Casi listo...</div>
+    </div>
+
     <div id="starContainer"></div>
 
-    <!-- Soru Arayüzü -->
     <div class="wrapper" id="viewInterface">
         <div class="pixel-window">
             <div class="window-bar">
@@ -197,13 +332,37 @@
         </div>
     </div>
 
-    <!-- Videodaki Takımyıldızı Kalp Ekranı -->
     <div class="special-screen" id="specialScreen">
         <canvas id="heartCanvas"></canvas>
         <div class="center-d" id="letterD">D</div>
     </div>
 
     <script>
+        // --- PARMAK İZİ TARAMA MANTIĞI ---
+        let scanTimer = null;
+
+        function startScan(e) {
+            if (e && e.cancelable) e.preventDefault(); // Telefonlar için çift tıklama engelleme
+            
+            // Eğer zaten tarama başladıysa tekrar tetikleme
+            if (scanTimer) return;
+
+            // 1.5 Saniye basılı tutulursa kilit yavaşça açılır
+            scanTimer = setTimeout(() => {
+                const lock = document.getElementById('lockScreen');
+                lock.style.opacity = '0';
+                lock.style.visibility = 'hidden';
+            }, 1500);
+        }
+
+        function cancelScan(e) {
+            // Elini erken çekerse tarama sıfırlanır
+            if (scanTimer) {
+                clearTimeout(scanTimer);
+                scanTimer = null;
+            }
+        }
+
         // Arka plandaki küçük zarif yıldızlar
         function createSmallStars() {
             const container = document.getElementById('starContainer');
@@ -265,10 +424,8 @@
                 special.style.display = 'block';
                 setTimeout(() => {
                     special.style.opacity = '1';
-                    // Videodaki gerçek örümcek ağı kalbi başlatır
                     startComplexPlexusHeart();
                     
-                    // Kalp belirdikten sonra D harfi arkadan süzülerek gelir
                     setTimeout(() => {
                         letterD.style.opacity = '1';
                     }, 1200);
@@ -276,7 +433,23 @@
             }, 500);
         }
 
-        // --- VİDEODAKİ GEOMETRİK BAĞLANTILI KALP ALGORİTMASI (PLEXUS MESH) ---
+        // --- KAÇMAYA ÇALIŞAN ÇİZGİLER VE PARÇACIK MOTORU (PLEXUS MESH WITH REPEL) ---
+        // Fare ve Dokunmatik takibi için konum objesi
+        const mouse = { x: null, y: null, radius: 100 }; // 100px etkileşim yarıçapı
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        window.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                mouse.x = e.touches[0].clientX;
+                mouse.y = e.touches[0].clientY;
+            }
+        });
+        window.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+        window.addEventListener('touchend', () => { mouse.x = null; mouse.y = null; });
+
         function startComplexPlexusHeart() {
             const canvas = document.getElementById('heartCanvas');
             const ctx = canvas.getContext('2d');
@@ -289,10 +462,8 @@
             resize();
 
             const particles = [];
-            // Net geometrik hatlar ve çizgiler için ideal nokta sayısı
             const particleCount = 180; 
 
-            // Videodaki matematiksel kalp eğrisi formülü
             function getHeartPoint(t) {
                 const scale = Math.min(canvas.width, canvas.height) / 30; 
                 return {
@@ -306,28 +477,44 @@
                     this.targetT = targetT;
                     this.basePoint = getHeartPoint(this.targetT);
                     
-                    // Kalbin etrafında mikro titreşimler yapması için rastgelelik
                     this.x = canvas.width / 2 + this.basePoint.x + (Math.random() - 0.5) * 30;
                     this.y = canvas.height / 2 + this.basePoint.y + (Math.random() - 0.5) * 30;
                     
-                    this.speed = Math.random() * 0.03 + 0.02;
+                    this.speed = 0.05; // Geri dönüş hızı esnekliği
                     this.radius = Math.random() * 1.5 + 1;
                     this.vibrationSeed = Math.random() * 100;
                 }
 
                 update(pulseFactor) {
-                    // Kalp ritmine göre hedef noktayı sürekli güncelle
                     const targetX = canvas.width / 2 + this.basePoint.x * pulseFactor;
                     const targetY = canvas.height / 2 + this.basePoint.y * pulseFactor;
 
                     this.vibrationSeed += 0.05;
-                    // Videodaki gibi noktaların canlı gibi titremesi sağlanır
-                    const jitterX = Math.sin(this.vibrationSeed) * 4;
-                    const jitterY = Math.cos(this.vibrationSeed) * 4;
+                    const jitterX = Math.sin(this.vibrationSeed) * 3;
+                    const jitterY = Math.cos(this.vibrationSeed) * 3;
 
-                    // Yumuşak takip mekanizması
-                    this.x += (targetX + jitterX - this.x) * this.speed;
-                    this.y += (targetY + jitterY - this.y) * this.speed;
+                    // Orijinal durması gereken yer
+                    let destX = targetX + jitterX;
+                    let destY = targetY + jitterY;
+
+                    // KAÇMAYA ÇALIŞAN ÇİZGİLER (MOUSE REPEL FİZİĞİ)
+                    if (mouse.x !== null && mouse.y !== null) {
+                        const dx = this.x - mouse.x;
+                        const dy = this.y - mouse.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < mouse.radius) {
+                            const force = (mouse.radius - distance) / mouse.radius;
+                            const angle = Math.atan2(dy, dx);
+                            // Fare yaklaştıkça noktaları ve dolayısıyla çizgileri dışa doğru fırlatır
+                            destX += Math.cos(angle) * force * 120; 
+                            destY += Math.sin(angle) * force * 120;
+                        }
+                    }
+
+                    // Fiziksel itme ivmesi uygulaması
+                    this.x += (destX - this.x) * this.speed;
+                    this.y += (destY - this.y) * this.speed;
                 }
 
                 draw() {
@@ -340,7 +527,6 @@
                 }
             }
 
-            // Kalp formunun üzerine noktaları diz
             for (let i = 0; i < particleCount; i++) {
                 const t = (i / particleCount) * Math.PI * 2;
                 particles.push(new HeartParticle(t));
@@ -352,31 +538,25 @@
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 timeCounter += 0.04;
 
-                // Kalbin kasılıp gevşeme (Atış) katsayısı
                 const pulseFactor = 1 + 0.08 * Math.sin(timeCounter * 1.5);
 
-                // 1. Adım: Tüm noktaların yerini güncelle ve çiz
                 particles.forEach(p => {
                     p.update(pulseFactor);
                     p.draw();
                 });
 
-                // 2. Adım: VİDEODAKİ ANA EFEKT - Noktaları birbirine örümcek ağı gibi bağla
-                ctx.shadowBlur = 0; // Çizgilerde kasma yapmaması için gölge sıfırlanır
+                ctx.shadowBlur = 0; 
                 for (let i = 0; i < particles.length; i++) {
                     for (let j = i + 1; j < particles.length; j++) {
                         const dx = particles[i].x - particles[j].x;
                         const dy = particles[i].y - particles[j].y;
                         const distance = Math.sqrt(dx * dx + dy * dy);
 
-                        // Eğer iki nokta birbirine yeterince yakınsa aralarında çizgi ör
-                        // Mesafe sınırını videodaki sıklığa göre ayarladım (65px)
                         if (distance < 65) {
                             ctx.beginPath();
                             ctx.moveTo(particles[i].x, particles[i].y);
                             ctx.lineTo(particles[j].x, particles[j].y);
                             
-                            // Yakınlığa göre çizginin opaklığı değişir (Birebir video estetiği)
                             const opacity = (1 - distance / 65) * 0.4;
                             ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
                             ctx.lineWidth = 0.6;
