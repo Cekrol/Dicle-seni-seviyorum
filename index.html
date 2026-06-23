@@ -27,7 +27,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;o
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -40,6 +40,7 @@
             width: 400px;
             max-width: 90%;
             box-shadow: 12px 12px 0px #1a1a1a;
+            transition: all 0.1s ease;
         }
 
         .window-bar {
@@ -89,6 +90,13 @@
             background: #ffffff;
             color: #000000;
             border: 4px inset #ffffff;
+        }
+
+        /* Kaçan No Butonu İçin Stil Ayarı */
+        #noBtn {
+            position: relative;
+            transition: all 0.2s ease;
+            z-index: 50;
         }
 
         .pixel-smiler {
@@ -182,7 +190,8 @@
                 <h1 class="title-text">Ne kadar tartışsakda seni seviyorum peki sen?</h1>
                 <div class="btn-container">
                     <button class="pixel-btn" onclick="triggerYes()">Yes</button>
-                    <button class="pixel-btn" onclick="triggerNo()">No</button>
+                    <!-- Hem dokunulduğunda hem de mouse üzerine geldiğinde kaçması için eventler eklendi -->
+                    <button class="pixel-btn" id="noBtn" onmouseover="fleeNo()" onclick="fleeNo()" ontouchstart="fleeNo()">No</button>
                 </div>
             </div>
         </div>
@@ -230,28 +239,33 @@
 
         window.addEventListener('resize', buildMatrixBackground);
 
+        // "Yes" butonuna basınca Matrix arka planı ve Neon Kalp (D🫠) açılacak
         function triggerYes() {
             document.getElementById('viewInterface').style.display = 'none';
-            document.getElementById('smileContainer').style.display = 'block';
+            buildMatrixBackground();
+            
+            bgContainer.style.display = 'flex';
+            setTimeout(() => bgContainer.style.opacity = '1', 10);
+            
+            document.getElementById('neonSet').style.display = 'flex';
         }
 
-        function triggerNo() {
-            const frame = document.getElementById('popupWindow');
+        // "No" butonunu ekranda rastgele kaçıran fonksiyon
+        function fleeNo() {
+            const noBtn = document.getElementById('noBtn');
             
-            // Ekran titreme efekti
-            frame.style.transform = 'translate(4px, 4px)';
-            setTimeout(() => frame.style.transform = 'translate(-4px, -4px)', 40);
-            setTimeout(() => frame.style.transform = 'translate(4px, -4px)', 80);
+            // Ekran genişliği ve yüksekliğine göre rastgele sınırlar belirle
+            const maxX = window.innerWidth - noBtn.offsetWidth - 40;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 40;
             
-            setTimeout(() => {
-                document.getElementById('viewInterface').style.display = 'none';
-                buildMatrixBackground();
-                
-                bgContainer.style.display = 'flex';
-                setTimeout(() => bgContainer.style.opacity = '1', 10);
-                
-                document.getElementById('neonSet').style.display = 'flex';
-            }, 130);
+            // Rastgele X ve Y koordinatları üret (Ekrandan dışarı taşmaması için)
+            const randomX = Math.max(20, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(20, Math.floor(Math.random() * maxY));
+            
+            // Butonun konumunu absolute yap ve yeni yerine fırlat
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
         }
     </script>
 </body>
